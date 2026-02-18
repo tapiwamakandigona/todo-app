@@ -1,0 +1,57 @@
+name: Build Desktop
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            ext: .exe
+          - os: ubuntu-latest
+            ext: .AppImage
+          - os: macos-latest
+            ext: .dmg
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install and build web app
+        run: |
+          npm install
+          npm run build
+        env:
+          VITE_BASE: "./"
+      
+      - name: Fix base path for Electron
+        run: |
+          node -e "
+            const fs = require('fs');
+            let html = fs.readFileSync('dist/index.html', 'utf8');
+            html = html.replace(/\/todo-app\//g, './');
+            fs.writeFileSync('dist/index.html', html);
+          "
+        shell: bash
+      
+      - name: Install Electron deps
+        run: npm install --save-dev electron electron-builder
+      
+      - name: Build desktop app
+        run: npx electron-builder --config electron-builder.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.exe
+            release/*.AppImage
+            release/*.dmg
+          fail_on_unmatched_files: false
