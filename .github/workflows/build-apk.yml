@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
       
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -25,20 +25,20 @@ jobs:
       - name: Install dependencies
         run: npm install
       
-      - name: Build web app for mobile
+      - name: Build web app
         run: npx vite build --base ./
       
-      - name: Setup Capacitor
+      - name: Setup Capacitor 5
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          cat > capacitor.config.json << 'EOF'
+          npm install @capacitor/core@5 @capacitor/cli@5 @capacitor/android@5
+          cat > capacitor.config.json << 'CAPEOF'
           {
             "appId": "com.tapiwa.todoapp",
             "appName": "Todo App",
             "webDir": "dist",
             "server": { "androidScheme": "https" }
           }
-          EOF
+          CAPEOF
           npx cap add android
           npx cap sync
       
@@ -48,10 +48,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
       
-      - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk todo-app.apk
-      
-      - name: Upload APK to Release
+      - name: Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          files: todo-app.apk
+          files: android/app/build/outputs/apk/debug/app-debug.apk
