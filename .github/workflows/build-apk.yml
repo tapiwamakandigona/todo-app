@@ -25,13 +25,20 @@ jobs:
       - name: Install dependencies
         run: npm install
       
-      - name: Build web app
-        run: npm run build
-        
-      - name: Install Capacitor
+      - name: Build web app for mobile
+        run: npx vite build --base ./
+      
+      - name: Setup Capacitor
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "Todo App" com.tapiwa.todoapp --web-dir dist
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.tapiwa.todoapp",
+            "appName": "Todo App",
+            "webDir": "dist",
+            "server": { "androidScheme": "https" }
+          }
+          EOF
           npx cap add android
           npx cap sync
       
@@ -41,8 +48,10 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
       
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk todo-app.apk
+      
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: android/app/build/outputs/apk/debug/app-debug.apk
-          fail_on_unmatched_files: false
+          files: todo-app.apk
