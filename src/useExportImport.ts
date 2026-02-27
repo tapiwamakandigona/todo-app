@@ -46,8 +46,7 @@ export function useExportImport(todos: Todo[], setTodos: (t: Todo[]) => void) {
     todos.forEach(t => {
       rows.push([t.id, '"' + t.text + '"', t.done, t.category, t.priority, new Date(t.createdAt).toISOString()].join(","));
     });
-    const blob = new Blob([rows.join("
-")], { type: "text/csv" });
+    const blob = new Blob([rows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
