@@ -99,7 +99,8 @@ function App() {
   return (
     <div className="app">
       <header>
-        <h1>Todo</h1>
+        <h1>TapDo</h1>
+        <p className="subtitle">Fast, offline-first tasks &mdash; by Tapiwa</p>
         <div className="stats-row">
           <span className="stat">{activeCount} active</span>
           <span className="stat done-stat">{doneCount} done</span>
@@ -184,7 +185,7 @@ function App() {
                 <span className="priority-dot" style={{ background: PRIORITY_COLORS[todo.priority] }} title={todo.priority} />
               </div>
             </div>
-            <button className="delete" onClick={() => deleteTodo(todo.id)}>\u00d7</button>
+            <button className="delete" onClick={() => deleteTodo(todo.id)}>{"\u00d7"}</button>
           </li>
         ))}
       </ul>
