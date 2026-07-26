@@ -42,9 +42,22 @@ export function useExportImport(todos: Todo[], setTodos: (t: Todo[]) => void) {
   }, [setTodos]);
 
   const exportCsv = useCallback(() => {
+    const escapeCsv = (val: string) => {
+      if (val.includes(",") || val.includes('"') || val.includes("\n")) {
+        return '"' + val.replace(/"/g, '""') + '"';
+      }
+      return val;
+    };
     const rows = ["ID,Text,Done,Category,Priority,Created"];
     todos.forEach(t => {
-      rows.push([t.id, '"' + t.text + '"', t.done, t.category, t.priority, new Date(t.createdAt).toISOString()].join(","));
+      rows.push([
+        t.id,
+        escapeCsv(t.text),
+        String(t.done),
+        escapeCsv(t.category),
+        t.priority,
+        new Date(t.createdAt).toISOString(),
+      ].join(","));
     });
     const blob = new Blob([rows.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -52,6 +65,7 @@ export function useExportImport(todos: Todo[], setTodos: (t: Todo[]) => void) {
     a.href = url;
     a.download = "todos.csv";
     a.click();
+    URL.revokeObjectURL(url);
   }, [todos]);
 
   return { exportJson, importJson, exportCsv };
