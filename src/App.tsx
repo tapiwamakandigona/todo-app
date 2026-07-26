@@ -15,8 +15,12 @@ const PRIORITY_COLORS = { low: "#22c55e", medium: "#eab308", high: "#ef4444" };
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>(() => {
-    const saved = localStorage.getItem("todos-v2");
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem("todos-v2");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
   const [input, setInput] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "done">("all");
@@ -27,7 +31,11 @@ function App() {
   const [sortBy, setSortBy] = useState<"date" | "priority" | "name">("date");
 
   useEffect(() => {
-    localStorage.setItem("todos-v2", JSON.stringify(todos));
+    try {
+      localStorage.setItem("todos-v2", JSON.stringify(todos));
+    } catch {
+      // localStorage may be unavailable (e.g. private browsing, quota exceeded)
+    }
   }, [todos]);
 
   const addTodo = () => {

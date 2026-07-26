@@ -1,5 +1,5 @@
 const CACHE_NAME = "todo-app-v2";
-const ASSETS = ["/", "/index.html"];
+const ASSETS = ["/todo-app/", "/todo-app/index.html"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
